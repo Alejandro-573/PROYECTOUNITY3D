@@ -14,18 +14,19 @@ public class Retroceder : StateMachineBehaviour
         controller = animator.GetComponent<Mage>();
         llego = false;
 
-        if (controller._player == null) return;
+        if (controller.Player == null) return;
 
-        Vector3 dir = (controller.transform.position - controller._player.transform.position).normalized;
+        Vector3 dir = (controller.transform.position - controller.Player.transform.position).normalized;
         puntoRetirada = controller.transform.position + dir * 5f;
 
-        controller._agen.stoppingDistance = 0;
-        controller._agen.SetDestination(puntoRetirada);
+        controller.Agen.stoppingDistance = 0;
+        controller.Agen.SetDestination(puntoRetirada);
+        Debug.Log(puntoRetirada);
     }
 
     override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
         {
-            if (!llego && !controller._agen.pathPending && controller._agen.remainingDistance <= controller._agen.stoppingDistance + 0.1f)
+            if (!llego && !controller.Agen.pathPending && controller.Agen.remainingDistance <= controller.Agen.stoppingDistance + 0.1f)
             {
                 llego = true;
                 animator.SetBool("RetrocesoListo", true);

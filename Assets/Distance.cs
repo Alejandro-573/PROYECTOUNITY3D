@@ -2,31 +2,41 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Patrulllar : StateMachineBehaviour
+public class Huida : StateMachineBehaviour
 {
     Mage controller;
 
-    private int posicionActual=0;
-    // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
-    override public void OnStateEnter(Animator animator, AnimatorStateInfo stateinfo, int layerindex)
+    public float escapeDistance = 6f;
+    public float hysteresisMargin = 5f;
+
+    override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        controller=animator.GetComponent<Mage>();
+        controller = animator.GetComponent<Mage>();
         controller.Agen.stoppingDistance = 0;
+
     }
 
-    // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
     override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        if(controller.Agen.hasPath && controller.Agen.remainingDistance < 0.1f)
-        { 
-            posicionActual++;
-
-            if (posicionActual >= controller._puntoPatrullaje.Count)
-            {
-                posicionActual = 0;
-            }
+        if (controller.Player == null)
+        {
+            animator.SetBool("Huida", false);
+            return;
         }
-        controller.Agen.SetDestination(controller._puntoPatrullaje[posicionActual].position);
+
+        Vector3 directionAway = (controller.transform.position - controller.Player.transform.position).normalized;
+        Vector3 targetPosition = controller.transform.position + directionAway * escapeDistance;
+
+        controller.Agen.SetDestination(targetPosition);
+
+        float distance = Vector3.Distance(controller.transform.position, controller.Player.transform.position);
+
+        
+        if (distance >= controller._maximaDistanciAtaque + hysteresisMargin)
+        {
+            animator.SetBool("Huida", false);
+            animator.SetBool("Escapar", true);  
+        }
     }
 
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state

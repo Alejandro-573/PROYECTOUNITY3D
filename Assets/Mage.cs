@@ -4,31 +4,36 @@ using UnityEngine.AI;
 
 public class Mage : MonoBehaviour
 {
-    public Animator _anim;
-    public NavMeshAgent _agen;
+    private Animator anim;
+    private NavMeshAgent agen;
     public List<Transform> _puntoPatrullaje;
     public Transform _detecpivot;
-    public GameObject _player;
+    private GameObject player;
     public LayerMask detecLayer;
     public float _distance;
     public float _maximaDistanciAtaque;
     public float _detecRadio;
 
+    public Animator Anim { get => anim; set => anim = value; }
+    public NavMeshAgent Agen { get => agen; set => agen = value; }
+    public object Agent { get; internal set; }
+    public GameObject Player { get => player; set => player = value; }
+
     void Start()
     {
-        _anim = GetComponent<Animator>();
-        _agen = GetComponent<NavMeshAgent>();
+        Anim = GetComponent<Animator>();
+        Agen = GetComponent<NavMeshAgent>();
     }
 
     void Update()
     {
-        if (_distance <= _maximaDistanciAtaque)
+        if (_distance >= _maximaDistanciAtaque)
         {
-            _anim.SetBool("ataque", true);
+            Anim.SetBool("ataque", true);
         }
         else
         {
-            _anim.SetBool("ataque", false);
+            Anim.SetBool("ataque", false);
         }
     }
 
@@ -37,16 +42,16 @@ public class Mage : MonoBehaviour
         Collider[] col = Physics.OverlapSphere(_detecpivot.position, _detecRadio, detecLayer);
         if (col.Length > 0)
         {
-            _player = col[0].gameObject;
-            _distance = Vector3.Distance(transform.position, _player.transform.position);
-            _anim.SetBool("DetectoJugador", true);
-            Debug.Log("Detecté jugador: " + _player.name);
+            Player = col[0].gameObject;
+            _distance = Vector3.Distance(transform.position, Player.transform.position);
+            Anim.SetBool("DetectoJugador", true);
+            Debug.Log("Detecté jugador: " + Player.name);
         }
         else
         {
-            _player = null;
+            Player = null;
             _distance = Mathf.Infinity;
-            _anim.SetBool("DetectoJugador", false);
+            Anim.SetBool("DetectoJugador", false);
         }
     }
 
